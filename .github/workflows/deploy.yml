@@ -18,10 +18,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Format
-        run: terraform fmt -recursive
+        run: terraform fmt -check -recursive
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend=false
 
       - name: Terraform Validate
         run: terraform validate
@@ -30,7 +30,7 @@ jobs:
         run: echo "Security scan step placeholder"
 
       - name: Terraform Plan
-        run: terraform plan -input=false || true
+        run: terraform plan -input=false -lock=false
 
       - name: Test Script Placeholder
         run: echo "Test script would run here"
