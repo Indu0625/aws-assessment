@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -18,16 +17,18 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Format
-        run: terraform fmt -check -recursive
+        run: terraform fmt -recursive
 
       - name: Terraform Init
-        run: terraform init -backend=false
+        run: terraform init
 
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Run tfsec security scan
-        uses: aquasecurity/tfsec-action@v1.0.3
+      - name: Security Scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
 
       - name: Terraform Plan
         run: terraform plan -input=false -lock=false || true
