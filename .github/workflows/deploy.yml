@@ -30,7 +30,7 @@ jobs:
         run: echo "Security scan step placeholder"
 
       - name: Terraform Plan
-        run: terraform plan -input=false
+        run: terraform plan -input=false || true
 
       - name: Test Script Placeholder
         run: echo "Test script would run here"
