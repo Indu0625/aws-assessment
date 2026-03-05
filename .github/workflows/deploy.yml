@@ -26,8 +26,8 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Security Scan Placeholder
-        run: echo "Security scan step placeholder"
+      - name: Run tfsec security scan
+        uses: aquasecurity/tfsec-action@v1.0.3
 
       - name: Terraform Plan
         run: terraform plan -input=false -lock=false || true
