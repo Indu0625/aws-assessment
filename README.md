@@ -1,164 +1,218 @@
-# AWS Serverless Infrastructure with Terraform
+AWS DevOps Skill Assessment
 
-This repository contains Infrastructure as Code (IaC) written in **Terraform** to deploy a simple serverless architecture on AWS.  
-The project demonstrates Terraform best practices along with a multi region deployments **CI/CD pipeline using GitHub Actions**. and M
-
----
-# Architecture Overview
-The infrastructure provisions the following AWS services:
-
-- **AWS Lambda** – Serverless compute to process requests
-- **Amazon API Gateway** – HTTP endpoint to trigger Lambda
-- **Amazon DynamoDB** – NoSQL database for data storage
-
-Architecture flow:
-
-Client → API Gateway → Lambda → DynamoDB
+Implementation of the AWS DevOps Skill Assessment using Terraform Infrastructure as Code, multi-region deployment, CI/CD automation, and SNS verification.
 
 ---
-Repository Structure
-aws-assessment
-│
-├── modules/
-│   └── regional_stack/
-│
-├── .github/
-│   └── workflows/
-│       └── deploy.yml
-│
-├── main.tf
-├── providers.tf
-├── variables.tf
-├── outputs.tf
-└── README.md
-### Description
 
-- **modules/**  
-  Contains reusable Terraform modules.
+1. Overview
 
-- **regional_stack/**  
-  Defines AWS resources like Lambda and DynamoDB.
+This project implements a multi-region serverless architecture on AWS using Terraform.
 
-- **.github/workflows/**  
-  Contains the GitHub Actions CI/CD pipeline.
+The infrastructure is deployed across the following AWS regions:
 
-- **providers.tf**  
-  Defines Terraform providers (AWS).
-
-- **variables.tf**  
-  Contains configurable input variables.
-
-- **outputs.tf**  
-  Displays Terraform output values after deployment.
-
-
-  ---------
-
-
-
-Regions:
 - us-east-1
 - eu-west-1
 
-Components:
+The system exposes API endpoints through API Gateway, processes requests using AWS Lambda, logs request data to DynamoDB, and publishes verification messages to SNS as required by the assessment.
+
+AWS Services Used
+
+- Amazon API Gateway (HTTP API)
+- AWS Lambda
+- Amazon DynamoDB
+- Amazon Cognito (JWT Authentication)
+- Amazon SNS
+- Amazon ECS Fargate
+- Terraform (Infrastructure as Code)
+- GitHub Actions (CI/CD)
+
+---
+
+2. Architecture
+
+Each region deploys an identical infrastructure stack using Terraform modules.
+
+System flow:
+
+Client → API Gateway → Lambda → DynamoDB
+↘ SNS Verification
+
+Greeter Lambda
+
+The Greeter Lambda performs the following actions:
+
+- Logs requests into DynamoDB
+- Publishes a verification message to SNS
+- Returns the current AWS region
+
+---
+
+3. Multi-Region Deployment
+
+Infrastructure is deployed across two regions using reusable Terraform modules.
+
+Region| Purpose
+us-east-1| Primary region
+eu-west-1| Secondary region
+
+Each region deploys:
+
 - API Gateway
-- Cognito Authentication
-- Lambda (Greeter + Dispatcher)
-- DynamoDB
-- ECS Fargate
-- SNS verification
+- Lambda functions
+- DynamoDB table
+- Cognito authorizer
 
-## API Endpoints
+---
 
-GET /greet  
+4. API Endpoints
+
+Terraform outputs the API Gateway endpoints after deployment.
+
+Greet Endpoint
+
+GET /greet
+
+Functionality:
+
+- Invokes the Greeter Lambda
+- Logs request information to DynamoDB
+- Sends SNS verification payload
+- Returns the region response
+
+Example response:
+
+{
+ "region": "us-east-1"
+}
+
+---
+
+Dispatch Endpoint
+
 POST /dispatch
 
-## SNS Verification Payload
+Functionality:
+
+- Invokes the Dispatcher Lambda
+- Dispatcher triggers an ECS Fargate task
+- ECS publishes verification payload to SNS
+
+---
+
+5. SNS Verification
+
+As required by the assessment, verification messages are published to the SNS topic:
+
+arn:aws:sns:us-east-1:637226132752:Candidate-Verification-Topic
+
+Example payload:
 
 {
  "email": "avulaindu096@gmail.com",
- "source": "Lambda | ECS",
- "region": "us-east-1 | eu-west-1",
+ "source": "Lambda",
+ "region": "us-east-1",
  "repo": "https://github.com/Indu0625/aws-assessment"
 }
+
+This payload format is used for both:
+
+- Lambda verification
+- ECS verification
+
 ---
 
-# CI/CD Pipeline
+6. Terraform Structure
 
-The project includes a **GitHub Actions CI pipeline** that automatically runs when code is pushed to the **main branch**.
+Project structure:
 
-Pipeline file: .github/workflows/deploy.yml
+aws-assessment
+│
+├── main.tf
+├── variables.tf
+├── outputs.tf
+│
+├── modules
+│   └── regional_stack
+│       └── main.tf
+│
+├── lambda
+│   ├── greeter
+│   └── dispatcher
+│
+├── .github
+│   └── workflows
+│       └── terraform-ci.yml
+│
+└── README.md
+
+The regional_stack module deploys infrastructure in each region.
+
 ---
 
-# CI/CD Stages
+7. CI/CD Pipeline
 
-### 1. Terraform Formatting Check
+A GitHub Actions pipeline is included to automate infrastructure validation.
 
-Ensures Terraform code follows standard formatting.
-terraform fmt -check -recursive
+Pipeline stages:
+
+1. Terraform format check
+2. Terraform initialization
+3. Terraform validation
+4. Security scan using Checkov
+5. Terraform plan generation
+6. Test execution placeholder
+
+Pipeline file:
+
+.github/workflows/terraform-ci.yml
+
 ---
 
-### 2. Terraform Validation
+8. Deployment Steps
 
-Validates Terraform configuration syntax.
+Initialize Terraform:
+
+terraform init
+
+Validate configuration:
+
 terraform validate
----
 
-### 3. Security Scan
+Generate execution plan:
 
-The pipeline integrates **Checkov**, an open-source security scanner for Infrastructure as Code.
-
-Checkov scans the Terraform configuration to detect security misconfigurations.
-
-Example checks include:
-
-- Encryption settings
-- IAM configuration
-- Lambda configuration
-- DynamoDB security settings
-
----
-
-### 4. Terraform Plan
-
-Generates an execution plan showing infrastructure changes.
 terraform plan
-For this assessment, AWS credentials are **not provided to the CI/CD runner**, so the pipeline runs the plan step in a way that does not block execution.
+
+Deploy infrastructure:
+
+terraform apply
 
 ---
 
-### 5. Test Execution Placeholder
+9. Terraform Outputs
 
-The pipeline includes a placeholder step representing where automated tests would run after deployment.
+After deployment Terraform outputs the API Gateway endpoints.
 
-Example:echo "Automated test script would run here"
----
+Run:
 
-# Running Terraform Locally
+terraform output
 
-Initialize Terraform:terraform init
-Validate configuration:terraform validate
-Generate execution plan:terraform plan
-Apply infrastructure:terraform apply
----
+Example output:
 
-# Security Note
+us_api_endpoint = https://gpr80v4dm0.execute-api.us-east-1.amazonaws.com/greet
+eu_api_endpoint = https://fxb2ynheka.execute-api.eu-west-1.amazonaws.com
 
-The pipeline includes a **Checkov security scan** to analyze the Terraform configuration for potential security issues.
-
-For the purpose of this assessment, the scan runs in **soft-fail mode**, allowing the pipeline to complete while still reporting security recommendations.
+These endpoints can be used to test the APIs.
 
 ---
 
-# CI/CD Workflow
+10. Repository
 
-Every push to the **main branch** triggers the following pipeline:
-Code Push ↓ Terraform Format Check ↓ Terraform Validate ↓ Security Scan (Checkov) ↓ Terraform Plan ↓ Test Placeholder
+GitHub Repository:
+
+https://github.com/Indu0625/aws-assessment
 
 ---
 
-# Author
+11. Author
 
-Indu
-
-
+Indu Avula
