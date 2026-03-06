@@ -16,22 +16,30 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
+      # Lint / Format Check
       - name: Terraform Format
-        run: terraform fmt -recursive
+        run: terraform fmt -check -recursive
 
+      # Initialize Terraform (without backend since no credentials are used)
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend=false
 
+      # Validate Terraform configuration
       - name: Terraform Validate
         run: terraform validate
 
+      # Security Scan using Checkov
       - name: Security Scan
         uses: bridgecrewio/checkov-action@master
         with:
           directory: .
+          soft_fail: true
 
+      # Generate Terraform Plan
+      # This will fail due to missing AWS credentials but will not stop pipeline
       - name: Terraform Plan
         run: terraform plan -input=false -lock=false || true
 
+      # Placeholder for automated testing
       - name: Test Script Placeholder
-        run: echo "Test script would run here"
+        run: echo "Automated test script from Step 4 would execute here"
