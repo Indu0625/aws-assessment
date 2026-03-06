@@ -1,7 +1,7 @@
 # AWS Serverless Infrastructure with Terraform
 
 This repository contains Infrastructure as Code (IaC) written in **Terraform** to deploy a simple serverless architecture on AWS.  
-The project demonstrates Terraform best practices along with a **CI/CD pipeline using GitHub Actions**.
+The project demonstrates Terraform best practices along with a multi region deployments **CI/CD pipeline using GitHub Actions**. and M
 
 ---
 # Architecture Overview
@@ -51,6 +51,36 @@ aws-assessment
 - **outputs.tf**  
   Displays Terraform output values after deployment.
 
+
+  ---------
+
+
+
+Regions:
+- us-east-1
+- eu-west-1
+
+Components:
+- API Gateway
+- Cognito Authentication
+- Lambda (Greeter + Dispatcher)
+- DynamoDB
+- ECS Fargate
+- SNS verification
+
+## API Endpoints
+
+GET /greet  
+POST /dispatch
+
+## SNS Verification Payload
+
+{
+ "email": "avulaindu096@gmail.com",
+ "source": "Lambda | ECS",
+ "region": "us-east-1 | eu-west-1",
+ "repo": "https://github.com/Indu0625/aws-assessment"
+}
 ---
 
 # CI/CD Pipeline
