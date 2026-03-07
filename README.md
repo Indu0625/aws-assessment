@@ -31,11 +31,11 @@ Prerequisites
 
 Ensure the following tools are installed before deployment.
 
-Tool| Version
-Terraform| >= 1.5
-AWS CLI| >= 2.x
-Bash| Linux/macOS shell
-Git| Latest
+Tool         Version
+Terraform    >= 1.5
+AWS CLI       >= 2.x
+Bash          Linux/macOS shell
+Git            Latest
 
 Configure AWS credentials:
 
