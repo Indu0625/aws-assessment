@@ -56,14 +56,14 @@ Architecture
 
 Authentication is centralized in us-east-1, while compute services are deployed in both regions.
 
-Layer            us-east-1 (Primary)             eu-west-1 (Secondary)
-Auth                Cognito User Pool + Client    Uses us-east-1 pool
-API                 API Gateway HTTP API          API Gateway HTTP API
-Compute            Lambda (Greeter + Dispatcher)   Lambda (Greeter + Dispatcher)
-Storage              DynamoDB GreetingLogs           DynamoDB GreetingLogs
-Container             ECS Fargate Cluster           ECS Fargate Cluster
-Messaging             SNS publish                     SNS publish
-
+| Layer      | us-east-1 (Primary)            | eu-west-1 (Secondary)      |
+|-----------|--------------------------------|----------------------------|
+| Auth      | Cognito User Pool + Client     | Uses us-east-1 pool        |
+| API       | API Gateway (HTTP API)         | API Gateway (HTTP API)     |
+| Compute   | Lambda (Greeter + Dispatcher)  | Lambda (Greeter + Dispatcher) |
+| Storage   | DynamoDB (GreetingLogs)        | DynamoDB (GreetingLogs)    |
+| Container | ECS Fargate Cluster            | ECS Fargate Cluster        |
+| Messaging | SNS publish                    | SNS publish                |
 ---
 
 Request Flow
